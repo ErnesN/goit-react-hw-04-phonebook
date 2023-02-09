@@ -1,69 +1,19 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { nanoid } from 'nanoid';
 
 import PhonebooksForm from './PhonebooksForm/PhonebooksForm';
 import PhonebookList from './PhonebookList/PhonebookList';
 import PhonebooksFilter from './PhonebooksFilter/PhonebooksFilter';
 
-import contacts from './contacts';
-
 import styles from './phonebooks.module.scss';
 
-class Phonebooks extends Component {
-  state = {
-    contacts: [...contacts],
-    filter: '',
-  };
+const Phonebooks = () => {
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const contacts = JSON.parse(localStorage.getItem('my-phonebooks'));
-    if (contacts?.length) {
-      this.setState({ contacts });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-    if (prevState.contacts.length !== contacts.length) {
-      localStorage.setItem('my-phonebooks', JSON.stringify(contacts));
-    }
-  }
-
-  removeContact = id => {
-    this.setState(({ contacts }) => {
-      const newContacts = contacts.filter(contact => contact.id !== id);
-      return { contacts: newContacts };
-    });
-  };
-
-  addContact = ({ name, number }) => {
-    if (this.isDublicate(name, number)) {
-      alert(`${name}: ${number} is already ixist`);
-      return false;
-    }
-
-    this.setState(prevState => {
-      const { contacts } = prevState;
-
-      const newContact = {
-        id: nanoid(),
-        name,
-        number,
-      };
-
-      return { contacts: [newContact, ...contacts] };
-    });
-    return true;
-  };
-
-  handleFilter = ({ target }) => {
-    this.setState({ filter: target.value });
-  };
-
-  isDublicate(name, number) {
+  const isDublicate = (name, number) => {
     const normalizedTitle = name.toLowerCase();
     const normalizedAuthor = number.toLowerCase();
-    const { contacts } = this.state;
     const result = contacts.find(({ name, number }) => {
       return (
         name.toLowerCase() === normalizedTitle &&
@@ -72,10 +22,33 @@ class Phonebooks extends Component {
     });
 
     return Boolean(result);
-  }
+  };
 
-  getFilteredContacts() {
-    const { filter, contacts } = this.state;
+  const addContact = ({ name, number }) => {
+    if (isDublicate(name, number)) {
+      alert(`${name}: ${number} is already ixist`);
+      return false;
+    }
+
+    setContacts(prevContacts => {
+      const newContact = {
+        id: nanoid(),
+        name,
+        number,
+      };
+
+      return [newContact, ...prevContacts];
+    });
+    return true;
+  };
+
+  const removeContact = id => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== id)
+    );
+  };
+  const handleFilter = ({ target }) => setFilter(target.value);
+  const getFilteredContacts = () => {
     if (!filter) {
       return contacts;
     }
@@ -89,29 +62,28 @@ class Phonebooks extends Component {
     });
 
     return result;
-  }
+  };
+  const filteredContacts = getFilteredContacts();
+  const isContacts = Boolean(filteredContacts.length);
 
-  render() {
-    const { addContact, removeContact, handleFilter } = this;
-    const contacts = this.getFilteredContacts();
-    const isContacts = Boolean(contacts.length);
-
-    return (
-      <div className={styles.wrapper}>
-        <div className={styles.block}>
-          <h1>Phonebook</h1>
-          <PhonebooksForm onSubmit={addContact} />
-        </div>
-        <div className={styles.block}>
-          <PhonebooksFilter handleChange={handleFilter} />
-          {isContacts && (
-            <PhonebookList removeContact={removeContact} contacts={contacts} />
-          )}
-          {!isContacts && <p>No contacts in list</p>}
-        </div>
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.block}>
+        <h1>Phonebook</h1>
+        <PhonebooksForm onSubmit={addContact} />
       </div>
-    );
-  }
-}
+      <div className={styles.block}>
+        <PhonebooksFilter handleChange={handleFilter} />
+        {isContacts && (
+          <PhonebookList
+            removeContact={removeContact}
+            contacts={filteredContacts}
+          />
+        )}
+        {!isContacts && <p>No contacts in list</p>}
+      </div>
+    </div>
+  );
+};
 
 export default Phonebooks;
