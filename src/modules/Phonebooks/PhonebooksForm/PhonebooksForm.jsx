@@ -56,33 +56,3 @@ export default PhonebooksForm;
 PhonebooksForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 };
-
-// class PhonebooksForm extends Component {
-//   state = { ...inititalState };
-
-//   handleSubmit = e => {
-//     e.preventDefault();
-//     const { onSubmit } = this.props;
-//     const result = onSubmit({ ...this.state });
-//     if (result) {
-//       this.reset();
-//     }
-//   };
-
-//   reset() {
-//     this.setState({ ...inititalState });
-//   }
-
-//   handleChange = ({ target }) => {
-//     const { name, value } = target;
-//     this.setState({
-//       [name]: value,
-//     });
-//   };
-
-//   render() {
-//     const { handleChange, handleSubmit } = this;
-//     const { name, number } = this.state;
-
-//   }
-// }
