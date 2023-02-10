@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import inititalState from './initialState';
+import initialState from './initialState';
 
 import styles from './phonebooks-form.module.scss';
 
 const PhonebooksForm = ({ onSubmit }) => {
-  const [state, setState] = useState({ ...inititalState });
+  const [state, setState] = useState({ ...initialState });
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
@@ -18,7 +18,7 @@ const PhonebooksForm = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
     onSubmit({ name, number });
-    setState({ ...inititalState });
+    setState({ ...initialState });
   };
 
   const { name, number } = state;
